@@ -8,6 +8,7 @@ Yii Framework 2 authclient extension Change Log
 - Bug #211: `RsaSha` was not passing `$key` to `openssl_pkey_get_private()` in `generateSignature()` (cfhodges)
 - Bug #220: Make `OpenIdConnect` client send token as bearer auth instead of querystring parameter (lukos)
 - Bug #237: Fixed redirect if user cancels login in auth form (msvit1989)
+- Enh #240: Added support for `yii\authclient\OpenIdConnect\initUserAttributes()` to retrieve claims from 'id_token' if UserInfo endpoint is undefined (CheckeredFlag)
 
 
 2.1.5 February 08, 2018

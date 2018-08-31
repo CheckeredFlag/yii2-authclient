@@ -97,6 +97,16 @@ class OpenIdConnect extends OAuth2
      * @see cache
      */
     public $configParamsCacheKeyPrefix = 'config-params-';
+    /**
+     * @var array OIDC standard claims
+     * @see http://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
+     */
+    public $standardClaims = [
+        'sub', 'name', 'given_name', 'family_name', 'middle_name', 'nickname',
+        'preferred_username', 'profile', 'picture', 'website', 'email',
+        'email_verified', 'gender', 'birthdate', 'zoneinfo', 'locale',
+        'phone_number', 'phone_number_verified', 'address', 'updated_at',
+    ];
 
     /**
      * @var bool|null whether to use and validate auth 'nonce' parameter in authentication flow.
@@ -190,12 +200,12 @@ class OpenIdConnect extends OAuth2
     /**
      * Returns particular configuration parameter value.
      * @param string $name configuration parameter name.
-     * @return mixed configuration parameter value.
+     * @return mixed configuration parameter value, `null` if name does not exist.
      */
     public function getConfigParam($name)
     {
         $params = $this->getConfigParams();
-        return $params[$name];
+        return array_key_exists($name, $params) ? $params[$name] : null;
     }
 
     /**
@@ -258,9 +268,16 @@ class OpenIdConnect extends OAuth2
      */
     protected function initUserAttributes()
     {
-        return $this->api($this->getConfigParam('userinfo_endpoint'), 'GET');
+        $userinfoUrl = $this->getConfigParam('userinfo_endpoint');
+        if ($userinfoUrl !== null) {
+            return $this->api($userinfoUrl, 'GET');
+        } else {
+            return array_filter($this->accessToken->params, function($claim) {
+                return in_array($claim, $this->standardClaims);
+            }, ARRAY_FILTER_USE_KEY);
+        }
     }
-	
+
     /**
      * {@inheritdoc}
      */
