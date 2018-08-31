@@ -272,8 +272,9 @@ class OpenIdConnect extends OAuth2
         if ($userinfoUrl !== null) {
             return $this->api($userinfoUrl, 'GET');
         } else {
-            return array_filter($this->accessToken->params, function($claim) {
-                return in_array($claim, $this->standardClaims);
+            $supportedClaims = $this->getConfigParam('claims_supported') ?: $this->standardClaims;
+            return array_filter($this->accessToken->params, function($claim) use ($supportedClaims) {
+                return in_array($claim, $supportedClaims);
             }, ARRAY_FILTER_USE_KEY);
         }
     }
